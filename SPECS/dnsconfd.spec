@@ -2,7 +2,7 @@
 %global selinuxtype targeted
 
 Name:           dnsconfd
-Version:        1.7.2
+Version:        1.7.3
 Release:        1%{?dist}
 Summary:        Local DNS cache configuration daemon
 License:        MIT
@@ -17,7 +17,9 @@ BuildRequires:  python3-rpm-macros
 BuildRequires:  python3-pip
 BuildRequires:  systemd
 BuildRequires:  systemd-rpm-macros
+%if %{defined fedora} && 0%{?fedora} < 42 || %{defined rhel} && 0%{?rhel} < 11
 %{?sysusers_requires_compat}
+%endif
 
 Requires:  (%{name}-selinux if selinux-policy-%{selinuxtype})
 Requires:  python3-gobject-base
@@ -28,6 +30,7 @@ Requires:  dbus-common
 Requires:  %{name}-cache
 Requires:  polkit
 Suggests:  %{name}-unbound
+Requires:  (%{name}-unbound = %{version}-%{release} if %{name}-unbound)
 
 %?python_enable_dependency_generator
 
@@ -182,11 +185,13 @@ fi
 %posttrans selinux
 %selinux_relabel_post -s %{selinuxtype}
 
+%if %{defined fedora} && 0%{?fedora} < 42 || %{defined rhel} && 0%{?rhel} < 11
 %pre
 %sysusers_create_compat %{SOURCE1}
 
 %pre unbound
 %sysusers_create_compat %{SOURCE1}
+%endif
 
 %post
 %systemd_post %{name}.service
@@ -230,12 +235,19 @@ fi
 %{_unitdir}/unbound.service.d/dnsconfd.conf
 %config(noreplace) %attr(644,unbound,unbound) %{_sysconfdir}/unbound/conf.d/unbound.conf
 %attr(664,dnsconfd,dnsconfd) %{_rundir}/dnsconfd/unbound.conf
+%{_sysusersdir}/dnsconfd.conf
 %{_tmpfilesdir}/dnsconfd-unbound.conf
 
 %files dracut
 %{_prefix}/lib/dracut/modules.d/99dnsconfd
 
 %changelog
+* Tue Jun 03 2025 Tomas Korbar <tkorbar@redhat.com> - 1.7.3-1
+- Rebase to 1.7.3
+- Resolves: RHEL-94999
+- Resolves: RHEL-94998
+- Resolves: RHEL-94997
+
 * Fri Feb 28 2025 Tomas Korbar <tkorbar@redhat.com> - 1.7.2-1
 - Rebase to 1.7.2
 - Resolves: RHEL-80309
