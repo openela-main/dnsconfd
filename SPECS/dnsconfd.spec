@@ -3,7 +3,7 @@
 
 Name:           dnsconfd
 Version:        1.7.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Local DNS cache configuration daemon
 License:        MIT
 URL:            https://github.com/InfrastructureServices/dnsconfd
@@ -43,7 +43,7 @@ Requires:            %{name} = %{version}-%{release}
 Requires:            selinux-policy-%{selinuxtype}
 Requires(post):      selinux-policy-%{selinuxtype}
 BuildRequires:       selinux-policy-devel
-%{?selinux_requires}
+%{?selinux_requires_min}
 
 %description selinux
 Dnsconfd SELinux policy module.
@@ -240,6 +240,10 @@ fi
 %{_prefix}/lib/dracut/modules.d/99dnsconfd
 
 %changelog
+* Wed May 13 2026 Tomas Korbar <tkorbar@redhat.com> - 1.7.5-2
+- Minimize selinux requirements
+- Resolves: RHEL-173630
+
 * Thu Jan 08 2026 Tomas Korbar <tkorbar@redhat.com> - 1.7.5-1
 - Rebase to 1.7.5
 - Resolves: RHEL-139870
